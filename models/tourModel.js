@@ -162,10 +162,10 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-tourSchema.post(/^find/, function (docs, next) {
-  // console.log(docs);
-  next();
-});
+// tourSchema.post(/^find/, function (docs, next) {
+//   // console.log(docs);
+//   next();
+// });
 
 // aggregation middleware
 // tourSchema.pre('aggregate', function (next) {

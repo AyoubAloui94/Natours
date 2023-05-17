@@ -2190,7 +2190,7 @@
     try {
       const res = await axios_default({
         method: "POST",
-        url: "http://localhost:3000/api/v1/users/login",
+        url: "/api/v1/users/login",
         data: {
           email,
           password
@@ -2210,7 +2210,7 @@
     try {
       const res = await axios_default({
         method: "GET",
-        url: "http://localhost:3000/api/v1/users/logout"
+        url: "/api/v1/users/logout"
       });
       if (res.data.status === "success")
         location.assign("/");
@@ -2224,7 +2224,7 @@
     try {
       const res = await axios_default({
         method: "POST",
-        url: "http://localhost:3000/api/v1/users/signup",
+        url: "/api/v1/users/signup",
         data: {
           name,
           email,
@@ -2246,7 +2246,7 @@
   // public/js/update.js
   var updateData = async (data, type) => {
     try {
-      const url = type === "data" ? "http://localhost:3000/api/v1/users/update-me" : "http://localhost:3000/api/v1/users/update-my-password";
+      const url = type === "data" ? "/api/v1/users/update-me" : "/api/v1/users/update-my-password";
       const res = await axios_default({
         method: "PATCH",
         url,
@@ -2267,10 +2267,7 @@
   );
   var bookTour = async (tourId) => {
     try {
-      const session = await axios_default(
-        `http://localhost:3000/api/v1/bookings/checkout-session/${tourId}`
-      );
-      console.log(session);
+      const session = await axios_default(`/api/v1/bookings/checkout-session/${tourId}`);
       await stripe.redirectToCheckout({
         sessionId: session.data.session.id
       });
