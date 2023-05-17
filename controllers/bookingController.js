@@ -38,7 +38,24 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${bookedTour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
-    line_items: transformedItems,
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: 'usd',
+          unit_amount: bookedTour.price * 100,
+          product_data: {
+            name: `${bookedTour.name} Tour`,
+            description: bookedTour.summary,
+            images: [
+              `${req.protocol}://${req.get('host')}/img/tours/${
+                bookedTour.imageCover
+              }`,
+            ],
+          },
+        },
+      },
+    ],
     mode: 'payment',
   });
   // create session as response
@@ -66,7 +83,7 @@ const createBookingCheckout = catchAsync(async (session) => {
   try {
     const tour = session.client_reference_id;
     const user = (await User.findOne({ email: session.customer_email }))._id;
-    const price = Number(session.line_items[0].price_data.unit_amount) / 100;
+    const price = session.line_items[0].price_data.unit_amount / 100;
 
     console.log(tour, user, price);
 
