@@ -4,6 +4,7 @@ import { login, logout } from './login.js';
 import { signup } from './signup';
 import { updateData } from './update';
 import { bookTour } from './stripe';
+import { showAlert } from './alerts';
 
 // DOM elements
 const loginForm = document.querySelector('.form--login');
@@ -86,3 +87,7 @@ if (bookBtn) {
     bookTour(tourId);
   });
 }
+
+const alertMessage = document.querySelector('body').dataset.alert;
+
+if (alertMessage) showAlert('success', alertMessage, 20);

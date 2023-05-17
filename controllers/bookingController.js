@@ -10,31 +10,15 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // get the booked tour
   const bookedTour = await Tour.findById(req.params.tourId);
 
-  const transformedItems = [
-    {
-      quantity: 1,
-      price_data: {
-        currency: 'usd',
-        unit_amount: bookedTour.price * 100,
-        product_data: {
-          name: `${bookedTour.name} Tour`,
-          description: bookedTour.summary,
-          images: [
-            `${req.protocol}://${req.get('host')}/img/tours/${
-              bookedTour.imageCover
-            }`,
-          ],
-        },
-      },
-    },
-  ];
   // create checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     // success_url: `${req.protocol}://${req.get('host')}/?tour=${
     //   req.params.tourId
     // }&user=${req.user.id}&price=${bookedTour.price}`,
-    success_url: `${req.protocol}://${req.get('host')}/my-bookings`,
+    success_url: `${req.protocol}://${req.get(
+      'host'
+    )}/my-bookings?alert=booking`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${bookedTour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
