@@ -76,7 +76,7 @@ const createBookingCheckout = catchAsync(async (session) => {
       price,
     });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   }
 });
 
