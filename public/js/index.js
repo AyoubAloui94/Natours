@@ -14,7 +14,7 @@ const updatePasswordForm = document.querySelector('.form-user-settings');
 const mapBox = document.querySelector('#map');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const bookBtn = document.querySelector('#book-tour');
-const alertMessage = document.querySelector('body').dataset.alert;
+const { alertMessage } = document.querySelector('body').dataset;
 
 // Delegation
 if (mapBox) {
@@ -90,5 +90,5 @@ if (bookBtn) {
 }
 
 if (alertMessage) {
-  showAlert('success', String(alertMessage), 20);
+  showAlert('success', alertMessage, 20);
 }
