@@ -23,3 +23,40 @@ export const updateData = async (data, type) => {
     showAlert('error', error.response.data.message);
   }
 };
+
+export const updateReview = async (rating, review, id) => {
+  try {
+    const res = await axios({
+      method: 'PATCH',
+      url: `/api/v1/reviews/${id}`,
+      data: {
+        rating,
+        review,
+      },
+    });
+    if (res.data.status === 'success') {
+      showAlert('success', `Review updated successfully!`);
+      window.setTimeout(() => {
+        location.assign('/my-reviews');
+      }, 1500);
+    }
+  } catch (error) {
+    showAlert('error', error.response.data.message);
+  }
+};
+
+export const deleteReview = async (id) => {
+  try {
+    const res = await axios({
+      method: 'DELETE',
+      url: `/api/v1/reviews/${id}`,
+    });
+
+    showAlert('success', `Review deleted successfully!`);
+    window.setTimeout(() => {
+      location.assign('/my-reviews');
+    }, 1500);
+  } catch (error) {
+    showAlert('error', error.response.data.message);
+  }
+};

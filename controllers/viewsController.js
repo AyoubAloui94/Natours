@@ -1,4 +1,5 @@
 const Booking = require('../models/bookingModel');
+const Review = require('../models/reviewModel');
 const Tour = require('../models/tourModel');
 const AppError = require('../utilities/appError');
 const catchAsync = require('../utilities/catchAsync');
@@ -20,11 +21,22 @@ exports.getTour = catchAsync(async (req, res, next) => {
     fields: 'review rating user',
   });
 
+  let booked = false;
+  if (res.locals.user) {
+    const booking = await Booking.findOne({
+      user: res.locals.user.id,
+      tour: tour.id,
+    });
+
+    if (booking) booked = true;
+  }
+
   if (!tour) return next(new AppError('There is no tour with that name.', 404));
 
   res.status(200).render('tour', {
     title: tour.name,
     tour: tour,
+    booked,
   });
 });
 
@@ -62,6 +74,31 @@ exports.getUserBookings = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getUserReviews = catchAsync(async (req, res, next) => {
+  const reviews = await Review.find({ user: req.user.id }).populate({
+    path: 'tour',
+  });
+  if (!reviews)
+    return next(new AppError('You have not reviewed ant yours', 404));
+  const reviewsArr = new Array(reviews);
+
+  res.status(200).render('_userReviews', {
+    title: 'My Reviews',
+    reviews: reviewsArr[0],
+  });
+});
+
+exports.getReview = catchAsync(async (req, res, next) => {
+  const review = await Review.findById(req.params.id).populate({
+    path: 'tour',
+  });
+
+  res.status(200).render('_updateReview', {
+    title: 'Review',
+    review,
+  });
+});
+
 exports.alerts = (req, res, next) => {
   const { alert } = req.query;
 
@@ -70,4 +107,17 @@ exports.alerts = (req, res, next) => {
       'Your booking was successful! Please check your email for a confirmation. If your booking does not show up here immediately, please come back later.';
   }
   next();
+};
+
+exports.getForgotPassword = (req, res) => {
+  res.status(200).render('forgetPassword', {
+    title: 'Forgot your password?',
+  });
+};
+
+exports.getResetPassword = (req, res) => {
+  res.status(200).render('resetPassword', {
+    title: 'Reset password',
+    token: req.params.token,
+  });
 };

@@ -2259,6 +2259,40 @@
       showAlert("error", error.response.data.message);
     }
   };
+  var updateReview = async (rating, review, id) => {
+    try {
+      const res = await axios_default({
+        method: "PATCH",
+        url: `/api/v1/reviews/${id}`,
+        data: {
+          rating,
+          review
+        }
+      });
+      if (res.data.status === "success") {
+        showAlert("success", `Review updated successfully!`);
+        window.setTimeout(() => {
+          location.assign("/my-reviews");
+        }, 1500);
+      }
+    } catch (error) {
+      showAlert("error", error.response.data.message);
+    }
+  };
+  var deleteReview = async (id) => {
+    try {
+      const res = await axios_default({
+        method: "DELETE",
+        url: `/api/v1/reviews/${id}`
+      });
+      showAlert("success", `Review deleted successfully!`);
+      window.setTimeout(() => {
+        location.assign("/my-reviews");
+      }, 1500);
+    } catch (error) {
+      showAlert("error", error.response.data.message);
+    }
+  };
 
   // public/js/stripe.js
   var import_catchAsync = __toESM(require_catchAsync());
@@ -2277,14 +2311,64 @@
     }
   };
 
+  // public/js/password.js
+  var forgotPassword = async (email, form) => {
+    try {
+      const res = await axios_default({
+        method: "POST",
+        url: `/api/v1/users/forgot-password`,
+        data: {
+          email
+        }
+      });
+      if (res.data.status === "success") {
+        showAlert(
+          "success",
+          `A password reset token has been sent to your email.`,
+          3
+        );
+        window.setTimeout(() => {
+          form.innerHTML = `<p class="email__sent">Please follow the instructions sent to you via email in order to reset your password.</p><div  class="email__icon"><img src="/img/email-part-2-svgrepo-com.svg"></div>`;
+        }, 1500);
+      }
+    } catch (error) {
+      showAlert("error", error.response.data.message);
+    }
+  };
+  var resetPassword = async (token, password, passwordConfirm) => {
+    try {
+      const res = await axios_default({
+        method: "PATCH",
+        url: `/api/v1/users/reset-password/${token}`,
+        data: {
+          password,
+          passwordConfirm
+        }
+      });
+      if (res.data.status === "success") {
+        showAlert("success", `Password changed successfully! Logging in...`);
+        window.setTimeout(() => {
+          location.assign("/");
+        }, 1500);
+      }
+    } catch (error) {
+      showAlert("error", error.response.data.message);
+    }
+  };
+
   // public/js/index.js
   var loginForm = document.querySelector(".form--login");
   var signupForm = document.querySelector(".form--signup");
   var updateUserForm = document.querySelector(".form-user-data");
   var updatePasswordForm = document.querySelector(".form-user-settings");
+  var updateReviewForm = document.querySelector(".form-update-review");
+  var forgetPasswordForm = document.querySelector(".form--forget-password");
+  var resetPasswordForm = document.querySelector(".form--reset-password");
   var mapBox = document.querySelector("#map");
   var logoutBtn = document.querySelector(".nav__el--logout");
   var bookBtn = document.querySelector("#book-tour");
+  var accReviews = document.querySelector(".account__reviews");
+  var deleteReviewBtn = document.querySelector(".btn--red");
   if (mapBox) {
     const locations = JSON.parse(mapBox.dataset.locations);
     displayMap(locations);
@@ -2347,5 +2431,46 @@
   var alertMessage = document.querySelector("body").dataset.alert;
   if (alertMessage) {
     showAlert("success", alertMessage, 20);
+  }
+  if (accReviews) {
+    accReviews.addEventListener("click", (evt) => {
+      const updateBtn = evt.target.closest(".btn__update");
+      if (!updateBtn)
+        return;
+    });
+  }
+  if (updateReviewForm) {
+    updateReviewForm.addEventListener("submit", async (evt) => {
+      evt.preventDefault();
+      document.querySelector(".btn--update").textContent = "Saving...";
+      const rating = document.querySelector("#user-rating").value;
+      const review = document.querySelector("#user-review").value;
+      const { id } = document.querySelector(".btn--update").dataset;
+      await updateReview(rating, review, id);
+    });
+  }
+  if (deleteReviewBtn) {
+    deleteReviewBtn.addEventListener("click", async (evt) => {
+      evt.preventDefault();
+      evt.target.textContent = "Deleting...";
+      const { id } = document.querySelector(".btn--update").dataset;
+      await deleteReview(id);
+    });
+  }
+  if (forgetPasswordForm) {
+    forgetPasswordForm.addEventListener("submit", async (evt) => {
+      evt.preventDefault();
+      const email = document.querySelector("#email").value;
+      await forgotPassword(email, forgetPasswordForm);
+    });
+  }
+  if (resetPasswordForm) {
+    resetPasswordForm.addEventListener("submit", async (evt) => {
+      evt.preventDefault();
+      const { token } = document.querySelector(".btn--green").dataset;
+      const password = document.querySelector("#password").value;
+      const passwordConfirm = document.querySelector("#passwordConfirm").value;
+      await resetPassword(token, password, passwordConfirm);
+    });
   }
 })();

@@ -1,0 +1,44 @@
+extends base
+
+include _reviewCard
+
+mixin navItem(link, text, icon, active) 
+  li(class=`${active ? 'side-nav--active' : ''}`)
+    a(href=`${link}`)
+      svg
+        use(xlink:href=`/img/icons.svg#icon-${icon}`)
+      | #{text}
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        ul.side-nav
+          +navItem('/account', 'Settings', 'settings', false) 
+          +navItem('/my-bookings', 'My bookings', 'briefcase', false)
+          +navItem('/my-reviews', 'My reviews', 'star', true)
+          +navItem('#', 'Billing', 'credit-card', false) 
+        -if(user.role === 'admin')
+          .admin-nav
+            h5.admin-nav__heading Admin
+            ul.side-nav
+              +navItem('#', 'Manage tours', 'map', false) 
+              +navItem('#', 'Manage users', 'users', false) 
+              +navItem('#', 'Manage reviews', 'star', false) 
+              +navItem('#', 'Manage bookings', 'briefcase', false) 
+      -if(reviews.length > 0)
+        .account__reviews
+              each review in reviews
+                  .reviews__card(style="margin-left:30px;margin-top:30px;margin-bottom:30px;")
+                    a.reviews__user(href=`/tour/${review.tour.slug}` style="margin-bottom:10px;") #{review.tour.name}
+                    p.reviews__text #{review.review}
+                      .reviews__rating
+                          each star in [1,2,3,4,5]
+                            svg.reviews__star(class=`reviews__star${star <= review.rating ? '--active' : '--inactive'}`)
+                              use(xlink:href='/img/icons.svg#icon-star')
+                      div(style="padding-top:35px;")
+                        a.btn__update.btn--green(href=`/my-reviews/${review.id}` data-id=`${review.id}`) Edit 
+      -else
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md You have not left any reviews. 
+    

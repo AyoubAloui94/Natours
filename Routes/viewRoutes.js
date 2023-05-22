@@ -1,7 +1,7 @@
 const express = require('express');
 const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
-const bookingController = require('../controllers/bookingController');
+const reviewController = require('../controllers/reviewController');
 
 const router = express.Router();
 
@@ -22,5 +22,19 @@ router.get(
   authController.protect,
   viewsController.getUserBookings
 );
+router.get(
+  '/my-reviews',
+  authController.protect,
+  viewsController.getUserReviews
+);
 
+router.get(
+  '/my-reviews/:id',
+  authController.protect,
+  viewsController.getReview
+);
+
+router.get('/forgot-password', viewsController.getForgotPassword);
+
+router.get('/reset-password/:token', viewsController.getResetPassword);
 module.exports = router;

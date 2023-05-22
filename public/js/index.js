@@ -2,18 +2,24 @@
 import { displayMap } from './mapbox';
 import { login, logout } from './login.js';
 import { signup } from './signup';
-import { updateData } from './update';
+import { updateData, updateReview, deleteReview } from './update';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts';
+import { forgotPassword, resetPassword } from './password';
 
 // DOM elements
 const loginForm = document.querySelector('.form--login');
 const signupForm = document.querySelector('.form--signup');
 const updateUserForm = document.querySelector('.form-user-data');
 const updatePasswordForm = document.querySelector('.form-user-settings');
+const updateReviewForm = document.querySelector('.form-update-review');
+const forgetPasswordForm = document.querySelector('.form--forget-password');
+const resetPasswordForm = document.querySelector('.form--reset-password');
 const mapBox = document.querySelector('#map');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const bookBtn = document.querySelector('#book-tour');
+const accReviews = document.querySelector('.account__reviews');
+const deleteReviewBtn = document.querySelector('.btn--red');
 
 // Delegation
 if (mapBox) {
@@ -92,4 +98,53 @@ const alertMessage = document.querySelector('body').dataset.alert;
 
 if (alertMessage) {
   showAlert('success', alertMessage, 20);
+}
+
+if (accReviews) {
+  accReviews.addEventListener('click', (evt) => {
+    const updateBtn = evt.target.closest('.btn__update');
+    if (!updateBtn) return;
+  });
+}
+
+if (updateReviewForm) {
+  updateReviewForm.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    document.querySelector('.btn--update').textContent = 'Saving...';
+    const rating = document.querySelector('#user-rating').value;
+    const review = document.querySelector('#user-review').value;
+    const { id } = document.querySelector('.btn--update').dataset;
+    // const id = window.location.href.split('/my-reviews/')[1];
+    await updateReview(rating, review, id);
+  });
+}
+
+if (deleteReviewBtn) {
+  deleteReviewBtn.addEventListener('click', async (evt) => {
+    evt.preventDefault();
+    evt.target.textContent = 'Deleting...';
+    // const id = window.location.href.split('/my-reviews/')[1];
+    const { id } = document.querySelector('.btn--update').dataset;
+    await deleteReview(id);
+  });
+}
+
+if (forgetPasswordForm) {
+  forgetPasswordForm.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    const email = document.querySelector('#email').value;
+    await forgotPassword(email, forgetPasswordForm);
+  });
+}
+
+if (resetPasswordForm) {
+  resetPasswordForm.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+
+    // const token = window.location.href.split('/reset-password/')[1];
+    const { token } = document.querySelector('.btn--green').dataset;
+    const password = document.querySelector('#password').value;
+    const passwordConfirm = document.querySelector('#passwordConfirm').value;
+    await resetPassword(token, password, passwordConfirm);
+  });
 }

@@ -1,0 +1,43 @@
+extends base
+
+
+mixin navItem(link, text, icon, active) 
+  li(class=`${active ? 'side-nav--active' : ''}`)
+    a(href=`${link}`)
+      svg
+        use(xlink:href=`/img/icons.svg#icon-${icon}`)
+      | #{text}
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        ul.side-nav
+          +navItem('/account', 'Settings', 'settings', false) 
+          +navItem('/my-bookings', 'My bookings', 'briefcase', false)
+          +navItem('/my-reviews', 'My reviews', 'star', true)
+          +navItem('#', 'Billing', 'credit-card', false) 
+        -if(user.role === 'admin')
+          .admin-nav
+            h5.admin-nav__heading Admin
+            ul.side-nav
+              +navItem('#', 'Manage tours', 'map', false) 
+              +navItem('#', 'Manage users', 'users', false) 
+              +navItem('#', 'Manage reviews', 'star', false) 
+              +navItem('#', 'Manage bookings', 'briefcase', false) 
+      
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md update your review on "#{review.tour.name}" tour:
+          form.form.form-update-review
+            .form__group
+              label.form__label(for='rating') Rating (1 to 5)
+              input#user-rating.form__input(type='text', value=`${review.rating}`, required)
+            .form__group.ma-bt-md
+              label.form__label(for='review') Review
+              textarea#user-review.form__input(type='email', required) #{review.review}
+
+            .form__group.right
+              button.btn.btn--red Delete
+              button.btn.btn--small.btn--green.btn--update(data-id=`${review.id}`) Update
+                
