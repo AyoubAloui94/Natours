@@ -1,11 +1,16 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const userController = require('../controllers/userController');
-const reviewController = require('../controllers/reviewController');
+const bookingRouter = require('./bookingRoutes');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
-router.get('/:userId/reviews', reviewController.getAllReviewsFromUser);
+router.use('/:userId/bookings', bookingRouter);
+
+// router.get('/:userId/reviews', reviewController.getAllReviewsFromUser);
+
+router.use('/:userId/reviews', reviewRouter);
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
