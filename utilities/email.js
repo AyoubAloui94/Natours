@@ -67,9 +67,9 @@ module.exports = class Email {
         apiKey: process.env.MAILERSEND_API_KEY,
       });
 
-      const sentFrom = new Sender(process.env.MAILERSEND_USERNAME, 'natours');
+      const sentFrom = new Sender(process.env.MAILERSEND_USERNAME, 'Natours');
 
-      const recipients = [new Recipient(this.to, 'test')];
+      const recipients = [new Recipient(this.to, this.firstName)];
 
       const emailParams = new EmailParams()
         .setFrom(sentFrom)
