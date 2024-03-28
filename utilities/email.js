@@ -3,6 +3,8 @@ const nodemailer = require('nodemailer');
 const pug = require('pug');
 const { htmlToText } = require('html-to-text');
 
+const { MailerSend, Recipient, EmailParams, Sender } = require('mailersend');
+
 module.exports = class Email {
   // prettier-ignore
   constructor(user, url) {
@@ -23,16 +25,16 @@ module.exports = class Email {
         },
       });
     }
-    // sendgrid
-    return nodemailer.createTransport({
-      service: 'SendGrid',
-      // host: 'smtp.sendgrid.net',
-      // port: 25,
-      auth: {
-        user: process.env.SENDGRID_USERNAME,
-        pass: process.env.SENDGRID_PASSWORD,
-      },
-    });
+
+    // return nodemailer.createTransport({
+    //   service: 'SendGrid',
+    //   host: 'smtp.sendgrid.net',
+    //   port: 465,
+    //   auth: {
+    //     user: process.env.SENDGRID_USERNAME,
+    //     pass: process.env.SENDGRID_PASSWORD,
+    //   },
+    // });
   }
 
   // send the actual email
@@ -47,18 +49,38 @@ module.exports = class Email {
       }
     );
 
-    // define email options
-    const mailOptions = {
-      from: this.from,
-      to: this.to,
-      subject,
-      html,
-      text: htmlToText(html),
-    };
+    if (process.env.NODE_ENV === 'development') {
+      // define email options
+      const mailOptions = {
+        from: this.from,
+        to: this.to,
+        subject,
+        html,
+        text: htmlToText(html),
+      };
 
-    // create transport and send email
+      // create transport and send email
 
-    await this.newTransport().sendMail(mailOptions);
+      await this.newTransport().sendMail(mailOptions);
+    } else {
+      const mailersend = new MailerSend({
+        apiKey: process.env.MAILERSEND_API_KEY,
+      });
+
+      const sentFrom = new Sender(process.env.MAILERSEND_USERNAME, 'natours');
+
+      const recipients = [new Recipient(this.to, 'test')];
+
+      const emailParams = new EmailParams()
+        .setFrom(sentFrom)
+        .setTo(recipients)
+        .setReplyTo(sentFrom)
+        .setSubject(subject)
+        .setHtml(html)
+        .setText(htmlToText(html));
+
+      await mailersend.email.send(emailParams);
+    }
   }
 
   async sendWelcome() {
